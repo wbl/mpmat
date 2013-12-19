@@ -1,5 +1,5 @@
 typedef mpmat *void;
-mpmat mpmat_init();
+mpmat mpmat_init(long long r, long long c);
 void mpmat_free(mpmat m);
 int mpmat_get(mpc_t v, mpmat m, long long r, long long c);
 int mpmat_set(mpmat m, long long r, long long c, mpc_t val);
@@ -7,3 +7,6 @@ int mpmat_add(mpmat c, mpmat a, mpmat b);
 int mpmat_sub(mpmat c, mpmat a, mpmat b);
 int mpmat_scale(mpmat c, mpmat a, mpc_t alpha);
 int mpmat_mul(mpmat c, mpmat a, mpmat b);
+int mpmat_rows(mpmat m);
+int mpmat_cols(mpmat m);
+void mpmat_set_prec(mpmat m, mpfr_prec_t prec);
