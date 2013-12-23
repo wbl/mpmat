@@ -8,12 +8,25 @@ typedef struct {
   mpc_t *space;
 } mpmat_t;
 
+static int mpmat_resize(mpmat_t c, long long r, long long c){
+  for(long long i=0; i<c->rows*c->cols; i++){
+    mpc_clear(c->space[i]);
+  }
+  c->space=(mpc_t *)realloc((void *)c->space, sizeof(mpc_t)*r*c);
+  for(long long i=0; i<c*r; i++){
+    mpc_init2(c->space[i], c->prec);
+  }
+  c->rows=r;
+  c->cols=c;
+  return 0;
+}
+
 mpmat mpmat_init(long long r, long long c){
-  mpmat_t *res=malloc(sizeof(mpmat_t));
+  mpmat_t *res=(mpmat_t*)malloc(sizeof(mpmat_t));
   res->prec=256;
   res->rows=r;
   res->cols=c;
-  res->space=malloc(sizeof(mpc_t)*r*c);
+  res->space=(mpc_t *)malloc(sizeof(mpc_t)*r*c);
   for(long long i=0; i<r*c; i++){
     mpc_init2(res->space[i], res->prec);
   }
@@ -58,4 +71,63 @@ int mpmat_add(mpmat c, mpmat a, mpmat b){
   cp=(mpmat_t *) c;
   ap=(mpmat_t *) a;
   bp=(mpmat_t *) b;
+  if((ap->rows != bp->rows) || (ap->cols != bp->cols)){
+    return -1;
+  }
+  // for convience we will resize c if necessary.
+  mpmat_resize(cp, ap->rows, ap->cols);
+  for(long long i=0; i<ap->rows*ap->cols; i++){
+    mpc_add(cp->space[i], ap->space[i], bp->space[i], MPC_RNDNN);
+  }
+  return 0;
 }
+
+int mpmat_sub(mpmat c, mpmat a, mpmat b){
+  mpmat_t *cp;
+  mpmat_t *ap;
+  mpmat_t *bp;
+  cp=(mpmat_t *) c;
+  ap=(mpmat_t *) a;
+  bp=(mpmat_t *) b;
+  if((ap->rows != bp->rows) || (ap->cols != bp->cols)){
+    return -1;
+  }
+  // for convience we will resize c if necessary.
+  mpmat_resize(cp, ap->rows, ap->cols);
+  for(long long i=0; i<ap->rows*ap->cols; i++){
+    mpc_sub(cp->space[i], ap->space[i], bp->space[i],MPC_RNDNN);
+  }
+  return 0;
+}
+
+int mpmat_scale(mpmat c, mpmat a, mpc_t alpha){
+  mpmat_t *ap=(mpmat_t *) a;
+  mpmat_t *cp=(mpmat_t *) c;
+  mpmat_resize(cp, ap->rows, ap->cols);
+  for(long long i=0; i<ap->rows*ap->cols; i++){
+    mpc_mul(cp->space[i], ap->space[i], alpha, MPC_RNDNN);
+  }
+  return 0;
+}
+
+int mpmat_rows(mpmat c){
+  return ((mpmat_t *)c)->rows;
+}
+
+
+int mpmat_cols(mpmat c){
+  return ((mpmat_t *)c)->cols;
+}
+
+int mpmat_mul(mpmat c, mpmat a, mpmat b){
+  mpmat_t *ap=(mpmat_t *)a;
+  mpmat_t *bp=(mpmat_t *)b;
+  mpmat_t *cp=(mpmat_t *)c;
+  if(ap->cols != bp->rows){ //compat on mult
+    return -1;
+  }
+  mpmat_resize(cp, ap->rows, bp->cols);
+  mpc_t tmp;
+  mpc_init2(tmp, ap->prec);
+  for(long long i=0; i<ap->rows; i++){
+    mpc_set
