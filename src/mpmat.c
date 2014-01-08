@@ -130,4 +130,16 @@ int mpmat_mul(mpmat c, mpmat a, mpmat b){
   mpc_t tmp;
   mpc_init2(tmp, ap->prec);
   for(long long i=0; i<ap->rows; i++){
-    mpc_set
+    for(long long j=0; j<bp->cols; j++){
+      mpc_set_ui(tmp, 0, MPC_RNDNN);
+      for(long long k=0; k<ap->cols; k++){
+        //a[i,k]*b[j,k] column major
+        mpc_fma(tmp, ap->space[k*ap->cols+i], bp->space[j*bp->cols+k],
+                tmp, MPC_RNDNN);
+      }
+      mpc_set(cp->space[i*cp->cols+j], tmp, MPC_RNDNN);
+    }
+  }
+  return 0;
+}
+    
