@@ -1,0 +1,7 @@
+VPATH=../src
+INC=-I/opt/local/include
+LINK=-lgmp -lmpc -L/opt/local/lib
+CFLAGS=-std=c99
+%.o : %.c
+	gcc-mp-4.8 -C $(CFLAGS) $(INC) $(LINK) $^ -o $@
+mpmat.o:mpmat.c

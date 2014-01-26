@@ -8,16 +8,16 @@ typedef struct {
   mpc_t *space;
 } mpmat_t;
 
-static int mpmat_resize(mpmat_t c, long long r, long long c){
-  for(long long i=0; i<c->rows*c->cols; i++){
-    mpc_clear(c->space[i]);
+static int mpmat_resize(mpmat_t *a, long long r, long long c){
+  for(long long i=0; i<a->rows*a->cols; i++){
+    mpc_clear(a->space[i]);
   }
-  c->space=(mpc_t *)realloc((void *)c->space, sizeof(mpc_t)*r*c);
+  a->space=(mpc_t *)realloc((void *)a->space, sizeof(mpc_t)*r*c);
   for(long long i=0; i<c*r; i++){
-    mpc_init2(c->space[i], c->prec);
+    mpc_init2(a->space[i], a->prec);
   }
-  c->rows=r;
-  c->cols=c;
+  a->rows=r;
+  a->cols=c;
   return 0;
 }
 

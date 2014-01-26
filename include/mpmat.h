@@ -1,4 +1,4 @@
-typedef mpmat *void;
+typedef void*  mpmat;
 mpmat mpmat_init(long long r, long long c);
 void mpmat_free(mpmat m);
 int mpmat_get(mpc_t v, mpmat m, long long r, long long c);
